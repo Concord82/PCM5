@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+
+    {% load pcm_template_tags %}
+    {% if other_var %}
+        <div class="row">
+            <div class="col-md-2">
+                <button class="btn btn-success pull-left" name="forward" value="{{ other_var.Date|date:'d-m-Y' }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-backward"></span> </button>
+            </div>
+            <div class="col-md-4 col-md-offset-2">
+                {% if date_form %}
+                    {{ date_form.media }}
+                    {% if date_form.errors %}
+                        {{ date_form.non_field_errors }}
+                    {% endif %}
+                    {% if date_form.dateinput.errors %}
+                        {{ date_form.dateinput.errors }}
+                    {% endif %}
+                    <form id='my_date_form' action="{% url 'viewlist' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class='input-group date' id='yourdatetimeid'>
+                                <h4 align="center">{{ other_var.Date|date:'d M Y'}}</h4>
+                                <input id="curent_form_data" name="curent_form_data" type="hidden" value="{{ other_var.Date|date:'d-m-Y' }}"/>
+                                <input id="yourdatetimeid" name="dateinput" type='hidden' class="form-control" onchange="this.form.submit()"/>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+
+                            </div>
+                        </div>
+                        {% autoescape off %}
+                        <script type="text/javascript">
+                            $(function () {
+                                 $('#yourdatetimeid').datetimepicker({
+                                    format: 'd m yyyy', //This is the default date format Django will accept, it also disables the time in the datepicker.
+                                    minView: 2,
+                                    autoclose: true,
+                                    language: 'en',
+                                    startView: 2,
+                                    defaultDate: '{{ other_var.Date|date:'d-m-Y' }}',
+                                    todayBtn: true
+                                })
+                            });
+                        </script>
+                        {% endautoescape %}
+                    </form>
+                {% else %}
+                    <h4 align="center">{{ other_var.Date}}</h4>
+                {% endif %}
+            </div>
+            <div class="col-md-2 col-md-offset-2">
+                {% now "Y-m-d" as todays_date %}
+                {% if other_var.Date|date:"Y-m-d" < todays_date  %}
+                    <button class="btn btn-success pull-right" name="backward" value="{{ other_var.Date }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-forward"></span> </button>
+                {% else %}
+                    <button class="btn btn-success pull-right" disabled="disabled"><span class="glyphicon glyphicon-forward"></span> </button>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if State_list %}
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>{% trans "User Name" %}</th>
+                            <th>{% trans "LogOn" %}</th>
+                            <th>{% trans "LogOff" %}</th>
+                            <th>{% trans "SpacingTimeWork" %}</th>
+                            <th>{% trans "Host name" %}</th>
+                            <th>{% trans "IP Address" %}</th>
+                            <th>{% trans "Trust to current value" %}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for State_rows in State_list %}
+                        {%  if not State_rows.Trust%}
+                            <tr class="danger">
+                        {% else %}
+                        <tr>
+                        {% endif %}
+                            <td>
+                                {{ State_rows.id}}
+                            </td>
+                            <td>
+                                <a href="{% url 'userpage' %}{{ State_rows.User }}">{{ State_rows.User}}</a>
+                            </td>
+                            <td>
+                                {{ State_rows.LogOn}}
+                            </td>
+                            <td>
+                                {{ State_rows.LogOff}}
+                            </td>
+                            <td>
+
+                                {% SpacingProgress  StartTime=State_rows.LogOn EndTime=State_rows.LogOff %}
+                            </td>
+                            <td>
+                                {{ State_rows.Host}}
+                            </td>
+                            <td>
+                                {{ State_rows.ipAddr}}
+                            </td>
+                            <td>
+                                {%  if State_rows.Trust%}
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if State_list.paginator.num_pages > 1 %}
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="btn-group pagination" role="group" aria-label="...">
+                    {% if State_list.has_previous %}
+                        <button class="btn btn-success" name="page" value="1" form="my_date_form" type="submit"><span class="glyphicon glyphicon-fast-backward"></span> </button>
+                        <button class="btn btn-success" name="page" value="{{ State_list.previous_page_number }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-backward"></span> </button>
+                    {% else %}
+                        <button class="btn btn-success" disabled="disabled"><span class="glyphicon glyphicon-fast-backward"></span> </button>
+                        <button class="btn btn-success" disabled="disabled"><span class="glyphicon glyphicon-backward"></span> </button>
+                    {% endif %}
+                    {% for page in State_list.paginator.page_range %}
+                        <button class="btn {% if State_list.number == page %}btn-danger{% else %}btn-success{% endif %}" name="page" value="{{ page }}" form="my_date_form" type="submit"> {{ page }} </button>
+                    {% endfor %}
+                    {% if State_list.has_next %}
+                        <button class="btn btn-success" name="page" value="{{ State_list.next_page_number }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-forward"></span> </button>
+                        <button class="btn btn-success" name="page" value="{{ State_list.paginator.num_pages }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-fast-forward"></span> </button>
+                    {% else %}
+                        <button class="btn btn-success" disabled="disabled"><span class="glyphicon glyphicon-forward"></span> </button>
+                        <button class="btn btn-success" disabled="disabled"><span class="glyphicon glyphicon-fast-forward"></span> </button>
+                     {% endif %}
+                </div>
+                <br>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block footer_text %}&copy; ООО КонсультантЪ 2016г.{% endblock %}
