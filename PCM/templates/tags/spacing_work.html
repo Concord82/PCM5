@@ -1,0 +1,13 @@
+{% if result %}
+    <div class="progress">
+        {% if result.spacework < 32400 %}
+            <div class="progress-bar progress-bar-success  progress-bar-striped active" role="progressbar" aria-valuenow="{{ result.spacework }}" aria-valuemin="0" aria-valuemax="28800" style="min-width: 5em; width: {{ result.percent }}%;">
+        {% elif result.spacework > 43200%}
+            <div class="progress-bar progress-bar-danger  progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+        {% else %}
+            <div class="progress-bar progress-bar-warning  progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+        {% endif %}
+         {{ result.spacetext}}
+      </div>
+    </div>
+{% endif %}

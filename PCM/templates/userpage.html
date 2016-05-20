@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load bootstrap3 %}
+    {% load pcm_template_tags %}
+    <div class="page-header">
+        <img src="http://juntos.cons.tsk.ru/images/stories/people/{{ userprofile.login_name }}.jpg">
+        <h1 align="right" >{{ userprofile.get_full_name }}</h1>
+    </div>
+    <table class="table table-striped" align="center" >
+        <tr>
+            <td colspan="2"> <a href="mailto:{{userprofile.email }}">{{ userprofile.email }}</a> </td>
+        </tr>
+        <tr>
+            <td>Отдел: {{ userprofile.departament }}</td><td>Должность: {{ userprofile.title }}</td>
+        </tr>
+    </table>
+    {% if State_list %}
+        <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Login</th>
+                <th>LogOn</th>
+                <th>LogOff</th>
+                <th>Время работы</th>
+                <th>Host</th>
+                <th>ipAddr</th>
+                <th>Trust</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for State_rows in State_list %}
+            {%  if not State_rows.Trust%}
+                <tr class="danger">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>
+                    {{ State_rows.idState}}
+                </td>
+                <td>
+                    <a href="userpage/{{ State_rows.User }}">{{ State_rows.User}}</a>
+                </td>
+                <td>
+                    {{ State_rows.LogOn}}
+                </td>
+                <td>
+                    {{ State_rows.LogOff}}
+                </td>
+                <td>
+
+                    {% SpacingProgress  StartTime=State_rows.LogOn EndTime=State_rows.LogOff %}
+                </td>
+                <td>
+                    {{ State_rows.Host}}
+                </td>
+                <td>
+                    {{ State_rows.ipAddr}}
+                </td>
+                <td>
+                    {%  if State_rows.Trust%}
+                        {% bootstrap_icon "ok" %}
+                    {% else %}
+                        {% bootstrap_icon "remove" %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    {% endif %}
+    </table>
+{% endblock %}
+
+{% block footer_text %}
+    &copy; ООО КонсультантЪ 2016г.
+{% endblock %}

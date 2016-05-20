@@ -1,0 +1,35 @@
+       {% load i18n %}
+                <form class="navbar-form navbar-right form-inline" role="form" method="post" action="/login">
+                    {% csrf_token %}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'userpage' %}">{{ user.get_full_name }}</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                         <button type="submit" class="btn btn-success">{% trans "Logout" %}</button>
+                    {% else %}
+                        {% if login_form.errors %}
+                             <div class="input-group has-error">
+                        {% else %}
+                             <div class="input-group">
+                        {% endif %}
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user "></i></span>
+                                <input class="form-control" type="text" name="username" placeholder={% trans "Login"%}>
+                             </div>
+                        {% if login_form.errors %}
+                             <div class="input-group has-error">
+                        {% else %}
+                             <div class="input-group">
+                        {% endif %}
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                <input class="form-control" type="password" name="password" placeholder={% trans "Password"%}>
+                             </div>
+                        {% if login_form.errors %}
+                        <button id="login-form"  type="submit" class="btn btn-success"  data-toggle="popover" data-trigger="click" data-placement="bottom" title="Ошибка входа" data-content="Логин или пароль неверны. Проверьте и повторите попытку входа."  >Войти</button>
+                        {% else %}
+                             <button id="login-form"  type="submit" class="btn btn-success">Войти</button>
+                        {% endif %}
+
+                     {% endif %}
+                 </form>
+                <script>
+                    $('#login-form').popover("show")
+                </script>
