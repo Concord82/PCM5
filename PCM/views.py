@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django_auth_ldap.backend import LDAPBackend
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 
-from .models import State
+from .models import State, Departament, User_Options
 User = get_user_model()
 
 # Create your views here.
@@ -36,9 +36,6 @@ def index(request):
             contacts = paginator.page(paginator.num_pages)
 
 
-        #for State_rows in State_list:
-        #    LDAPBackend().populate_user(State_rows.User)
-
 
         return render(request, 'index.html', {'State_list': contacts, 'other_var': other_var})
     else:
@@ -51,6 +48,12 @@ def login(request):
             user = form.login (request)
             if user:
                 auth.login(request, user)
+
+                user_param = User_Options.objects.create(user=user)
+                user_param.save()
+
+
+
                 return HttpResponseRedirect("/")# Redirect to a success page.
         return render(request, 'index.html', {'login_form': form })
     else:
@@ -101,8 +104,10 @@ def listofday(request, year=None, month=None, day=None):
 
 def view_list(request):
     if request.user.is_authenticated():
-        curent_date = datetime.date.today()
+        curent_date = datetime.date.today() + datetime.timedelta(-1)
+        departament = Departament.objects.all()
         if request.method == 'POST':
+
             date_form = date_select_form(request.POST)
             if date_form.is_valid():
                 curent_date = date_form.cleaned_data['dateinput']
@@ -118,10 +123,13 @@ def view_list(request):
             date_form = date_select_form()
             date_form.fields['dateinput'].initial = curent_date
 
-        other_var = {}
-        other_var['Date'] = curent_date
+
 
         State_list = State.objects.filter(LogOn__year=curent_date.year, LogOn__month=curent_date.month, LogOn__day=curent_date.day, LogOff__isnull=False).order_by('id')
+
+
+        other_var = {}
+        other_var['Date'] = curent_date
         paginator = Paginator(State_list, 25)  # Show 25 contacts per page
 
         page = request.POST.get('page')
@@ -133,6 +141,6 @@ def view_list(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             contacts = paginator.page(paginator.num_pages)
-        return render(request, 'view_list.html', {'State_list': contacts, 'other_var': other_var, 'date_form': date_form})
+        return render(request, 'view_list.html', {'State_list': contacts, 'other_var': other_var, 'date_form': date_form, 'depts': departament})
     else:
         raise Http404

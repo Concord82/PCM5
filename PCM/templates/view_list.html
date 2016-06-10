@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load mptt_tags %}
 {% block content %}
-
     {% load pcm_template_tags %}
     {% if other_var %}
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-2 col-md-offset-1">
                 <button class="btn btn-success pull-left" name="forward" value="{{ other_var.Date|date:'d-m-Y' }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-backward"></span> </button>
             </div>
-            <div class="col-md-4 col-md-offset-2">
+            <div class="col-md-6">
+                <div class="row">
                 {% if date_form %}
                     {{ date_form.media }}
                     {% if date_form.errors %}
@@ -22,10 +23,9 @@
                         <div class="form-group">
                             <div class='input-group date' id='yourdatetimeid'>
                                 <h4 align="center">{{ other_var.Date|date:'d M Y'}}</h4>
-                                <input id="curent_form_data" name="curent_form_data" type="hidden" value="{{ other_var.Date|date:'d-m-Y' }}"/>
                                 <input id="yourdatetimeid" name="dateinput" type='hidden' class="form-control" onchange="this.form.submit()"/>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-
+                                <span class="input-group-addon btn-success"><span class="glyphicon glyphicon-calendar"></span></span>
+                                <input id="curent_form_data" name="curent_form_data" type="hidden" value="{{ other_var.Date|date:'d-m-Y' }}"/>
                             </div>
                         </div>
                         {% autoescape off %}
@@ -35,7 +35,7 @@
                                     format: 'd m yyyy', //This is the default date format Django will accept, it also disables the time in the datepicker.
                                     minView: 2,
                                     autoclose: true,
-                                    language: 'en',
+                                    language: 'ru',
                                     startView: 2,
                                     defaultDate: '{{ other_var.Date|date:'d-m-Y' }}',
                                     todayBtn: true
@@ -47,8 +47,74 @@
                 {% else %}
                     <h4 align="center">{{ other_var.Date}}</h4>
                 {% endif %}
+                </div>
+                <div class="row">
+                    <div class="input-group">
+
+                        <select id="id_departament" name="departament" class="form-control">
+                            <option selected="selected" value="">---------</option>
+                            <!---{% for dept in depts %}
+
+
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        -->
+
+                        {% recursetree depts %}
+                            <option value="{{ node.id }}">{% if node.is_child_node %}---{% endif %}{{ node.name }}</option>
+                            {% if not node.is_leaf_node %}
+                                --- {{ children }}
+                            {% endif %}
+                        {% endrecursetree %}
+                        </select>
+
+                        <select id="id_departament" name="departament" class="form-control">
+                            {% for node,structure in depts|tree_info:"ancestors" %}
+                                {% if node.is_child_node %}
+                                    <option value="{{ node.id }}">
+                                        {{ structure.ancestors|tree_path }} :: {{ node }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+
+                        <select id="id_departament" name="departament" class="form-control">
+                            <option selected="selected" value="">---------</option>
+                            {% recursetree depts %}
+
+                                    <option value="{{ node.id }}">--{{ node.name }}</option>
+                                    {% if not node.is_leaf_node %}
+
+                                            {{ children }}
+
+                                    {% endif %}
+
+                            {% endrecursetree %}
+                        </select>
+
+
+
+
+
+
+
+                        <div class="input-group-btn">
+
+
+                        <button class="btn btn-success" form="my_date_form" type="submit">   Все  </button>
+                        <button class="btn btn-success" form="my_date_form" type="submit"> > 12 ч.</button>
+                        <button class="btn btn-success" form="my_date_form" type="submit"> > 24 ч.</button>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                </div>
             </div>
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2">
                 {% now "Y-m-d" as todays_date %}
                 {% if other_var.Date|date:"Y-m-d" < todays_date  %}
                     <button class="btn btn-success pull-right" name="backward" value="{{ other_var.Date }}" form="my_date_form" type="submit"><span class="glyphicon glyphicon-forward"></span> </button>

@@ -3,7 +3,8 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.admin import widgets
 from datetimewidget.widgets import DateWidget, DateTimeWidget
-
+from mptt.forms import TreeNodeChoiceField
+from .models import Departament
 
 
 class AuthForm(forms.Form):
@@ -24,13 +25,9 @@ class AuthForm(forms.Form):
         user = authenticate(username=username, password=password)
         return user
 
-
-def validate(self, value):
-    print value
-
-
 class date_select_form(forms.Form):
     dateinput = forms.DateField(widget=DateWidget(attrs={'id':"yourdatetimeid"}, usel10n = True, bootstrap_version=3), input_formats=['%d %m %Y'], localize=True, required=False)
+    #departament = TreeNodeChoiceField(queryset=Departament.objects.all(),)
 
 
 

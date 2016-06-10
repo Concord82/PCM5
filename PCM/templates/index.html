@@ -2,7 +2,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% load bootstrap3 %}
     {% load pcm_template_tags %}
     {% if other_var %}
         <div class="container-fluid">
@@ -62,9 +61,9 @@
                             </td>
                             <td>
                                 {%  if State_rows.Trust%}
-                                    {% bootstrap_icon "ok" %}
+                                    <span class="glyphicon glyphicon-ok">
                                 {% else %}
-                                    {% bootstrap_icon "remove" %}
+                                    <span class="glyphicon glyphicon-remove">
                                 {% endif %}
                             </td>
                         </tr>

@@ -31,20 +31,27 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+
+EXTERNAL_APPS = [
     'django_auth_ldap',
     'datetimewidget',
-    'bootstrap3',
+    'mptt',
+]
+
+MY_APPS = [
     'PCM',
     'extuser',
 ]
+INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + MY_APPS
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -173,7 +180,7 @@ AUTHENTICATION_BACKENDS = [
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'Asia/Novosibirsk'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -222,3 +229,6 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_HOST = 'smtp.cons.tsk.ru'
+EMAIL_PORT = 25
